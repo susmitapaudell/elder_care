@@ -2,6 +2,21 @@
   "bishal": {
     "username": "bishal",
     "phone": "9843050083",
-    "password": "bis"
+    "password": "bishal"
+  },
+  "kushal": {
+    "username": "kushal",
+    "phone": "9833333333",
+    "password": "kushal"
+  },
+  "bipana": {
+    "username": "bipana",
+    "phone": "98666666666",
+    "password": "bipana"
+  },
+  "birat": {
+    "username": "birat",
+    "phone": "9877777777",
+    "password": "birat"
   }
 }

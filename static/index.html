@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Swastha Saathi</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <h1>Welcome to Swastha Saathi</h1>
+    <div id="role-selection">
+      <button onclick="selectRole('elder')">I am an Elder</button>
+      <button onclick="selectRole('caregiver')">I am a Caregiver</button>
+    </div>
+
+    <div id="auth-form" class="hidden">
+      <h2 id="form-title">Login / Signup</h2>
+      <input type="text" id="username" placeholder="Username" />
+      <input type="text" id="phone" placeholder="Phone" />
+      <input type="password" id="password" placeholder="Password" />
+      <div>
+        <button onclick="submitForm('signup')">Signup</button>
+        <button onclick="submitForm('login')">Login</button>
+      </div>
+      <button onclick="goBack()">← Back</button>
+    </div>
+
+    <div id="message"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import json, os
+from userprofile import UserProfile
 
 app = FastAPI()
 
@@ -8,7 +9,7 @@ DATA_DIR = "database"
 os.makedirs(DATA_DIR, exist_ok=True)
 
 # Ensure JSON files exist
-for role in ["elder", "caregiver", "connection"]:
+for role in ["elder", "caregiver", "connections"]:
     path = os.path.join(DATA_DIR, f"{role}.json")
     if not os.path.exists(path):
         with open(path, "w") as f:
@@ -54,11 +55,11 @@ def handle_user(action: str, role: str, user: User):
         return {"message": f"Signup successful. You are signed up as {user.username} ({role})"}
 
     elif action == "login":
-        if user.phone not in data:
+        if user.username not in data:
             raise HTTPException(status_code=404, detail="User not found")
-        if data[user.phone]["password"] != user.password:
+        if data[user.username]["password"] != user.password:
             raise HTTPException(status_code=401, detail="Incorrect password")
-        return {"message": f"Login successful. You are logged in as {data[user.phone]['username']} ({role})"}
+        return {"message": f"Login successful. You are logged in as {data[user.username]['username']} ({role})"}
 
 # Connection endpoint
 @app.post("/connect")
@@ -76,3 +77,39 @@ def connect_users(elder_username: str, caregiver_username: str):
     save_data("connections", connections)
 
     return {"message": f"Elder {elders[elder_username]['username']} connected with caregiver {caregivers[caregiver_username]['username']}"}
+
+from fastapi.staticfiles import StaticFiles
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
+
+@app.post("/profile/{role}/{username}")
+def add_profile(role: str, username: str, profile: UserProfile):
+    # Validate role
+    if role not in ["elder", "caregiver"]:
+        raise HTTPException(status_code=400, detail="Role must be 'elder' or 'caregiver'")
+
+    # Load users from appropriate JSON
+    users = load_data(role)
+
+    # Check if user exists
+    if username not in users:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Update user's info with profile fields and computed values
+    users[username].update(profile.model_dump())
+
+    users[username]['username'] = profile.full_name
+    users[username]['role'] = profile.role
+    users[username]['dob'] = profile.dob
+    users[username]['height_cm'] = profile.height_cm
+    users[username]['weight_kg'] = profile.weight_kg
+    users[username]['bmi'] = profile.bmi
+    users[username]['blood_group'] = profile.blood_group
+
+    # Save back updated data
+    save_data(role, users)
+
+    return {
+        "message": f"Profile updated for {username} ({role})",
+        "age": profile.age,
+        "bmi": profile.bmi
+    }

@@ -1,0 +1,50 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f0f4f8;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+}
+
+#app {
+  max-width: 400px;
+  margin: auto;
+  padding: 30px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+button {
+  margin: 10px;
+  padding: 10px 20px;
+  border: none;
+  background-color: #0077cc;
+  color: white;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #005fa3;
+}
+
+input {
+  display: block;
+  width: 90%;
+  margin: 10px auto;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.hidden {
+  display: none;
+}
+
+#message {
+  margin-top: 20px;
+  font-weight: bold;
+  color: green;
+}
