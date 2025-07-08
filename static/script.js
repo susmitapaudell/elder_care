@@ -4,7 +4,7 @@ function selectRole(role) {
   selectedRole = role;
   document.getElementById("role-selection").classList.add("hidden");
   document.getElementById("auth-form").classList.remove("hidden");
-  document.getElementById("form-title").innerText = `Login / Signup as ${role}`;
+  document.getElementById("form-title").innerText = `लगइन/ साइन अप as ${role}`;
 }
 
 function goBack() {
