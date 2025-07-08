@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+  <meta charset="UTF-8" />
+  <title>अपोइन्टमेन्ट र रिपोर्ट</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f8f8f8;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    .section-block {
+      background: #ffffff;
+      border: 1px solid #ddd;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 14px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    button {
+      background-color: #2e86de;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🗓️ Appointment Section -->
+  <div class="section-block">
+    <h2>🗓️ कुनै अपोइन्टमेन्ट?</h2>
+    <form id="appointmentForm">
+      <label for="appDate">मिति</label>
+      <input type="date" id="appDate" required />
+
+      <label for="appDay">बार (optional)</label>
+      <input type="text" id="appDay" placeholder="सोमबार, मंगलबार..." />
+
+      <label for="appTime">समय</label>
+      <input type="time" id="appTime" required />
+
+      <button type="submit">अपोइन्टमेन्ट थप्नुहोस्</button>
+    </form>
+
+    <h3>📋 थप गरिएका अपोइन्टमेन्टहरू:</h3>
+    <ul id="appointmentList"></ul>
+  </div>
+
+  <!-- 📑 Reports Section -->
+  <div class="section-block">
+    <h2>📑 रिपोर्ट</h2>
+    <form id="reportForm">
+      <label for="reportType">रिपोर्ट प्रकार:</label>
+      <select id="reportType" required>
+        <option value="">-- रिपोर्ट चयन गर्नुहोस् --</option>
+        <option value="रक्त परीक्षण">रक्त परीक्षण</option>
+        <option value="सारांश रिपोर्ट">सारांश रिपोर्ट</option>
+        <option value="ब्लड प्रेसर रिपोर्ट">ब्लड प्रेसर रिपोर्ट</option>
+        <option value="औषधि प्रगति रिपोर्ट">औषधि प्रगति रिपोर्ट</option>
+      </select>
+
+      <button type="submit">रिपोर्ट थप्नुहोस्</button>
+    </form>
+
+    <h3>📋 थप गरिएका रिपोर्टहरू:</h3>
+    <ul id="reportList"></ul>
+  </div>
+
+  <script>
+    const appointmentForm = document.getElementById('appointmentForm');
+    const appointmentList = document.getElementById('appointmentList');
+
+    appointmentForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const date = document.getElementById('appDate').value;
+      const day = document.getElementById('appDay').value.trim();
+      const time = document.getElementById('appTime').value;
+
+      const item = document.createElement('li');
+      item.textContent = `${date}${day ? ' (' + day + ')' : ''} - ${time}`;
+      appointmentList.appendChild(item);
+      appointmentForm.reset();
+    });
+
+    const reportForm = document.getElementById('reportForm');
+    const reportList = document.getElementById('reportList');
+
+    reportForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const reportType = document.getElementById('reportType').value;
+
+      if (reportType) {
+        const item = document.createElement('li');
+        item.textContent = reportType;
+        reportList.appendChild(item);
+        reportForm.reset();
+      }
+    });
+  </script>
+
+</body>
+</html>
