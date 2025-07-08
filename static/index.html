@@ -7,22 +7,22 @@
 </head>
 <body>
   <div id="app">
-    <h1>Welcome to Swastha Saathi</h1>
+    <h1>स्वास्थ्य साथीमा स्वागत छ!</h1>
     <div id="role-selection">
-      <button onclick="selectRole('elder')">I am an Elder</button>
-      <button onclick="selectRole('caregiver')">I am a Caregiver</button>
+      <button onclick="selectRole('elder')">वृद्ध</button>
+      <button onclick="selectRole('caregiver')">सेवा प्रदायक</button>
     </div>
 
     <div id="auth-form" class="hidden">
-      <h2 id="form-title">Login / Signup</h2>
+      <h2 id="form-title"> लगइन/ साइन अप</h2>
       <input type="text" id="username" placeholder="Username" />
       <input type="text" id="phone" placeholder="Phone" />
       <input type="password" id="password" placeholder="Password" />
       <div>
-        <button onclick="submitForm('signup')">Signup</button>
-        <button onclick="submitForm('login')">Login</button>
+        <button onclick="submitForm('signup')">साइन अप</button>
+        <button onclick="submitForm('login')">लगइन</button>
       </div>
-      <button onclick="goBack()">← Back</button>
+      <button onclick="goBack()">←अघिल्लो पृष्ठमा फर्कनुहोस् </button>
     </div>
 
     <div id="message"></div>
