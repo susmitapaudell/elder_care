@@ -32,10 +32,10 @@ def save_data(role, data):
     with open(get_path(role), "w") as f:
         json.dump(data, f, indent=2)
 
-# Root
-@app.get("/")
-def root():
-    return {"message": "Welcome to Swastha Saathi! Select 'elder' or 'caregiver' and choose login or signup."}
+# # Root
+# @app.get("/")
+# def root():
+#     return {"message": "Welcome to Swastha Saathi! Select 'elder' or 'caregiver' and choose login or signup."}
 
 # Common login/signup handler
 @app.post("/continue/{action}/{role}")
@@ -62,7 +62,7 @@ def handle_user(action: str, role: str, user: User):
         return {"message": f"Login successful. You are logged in as {data[user.username]['username']} ({role})"}
 
 # Connection endpoint
-@app.post("/connect")
+@app.get("/connect")
 def connect_users(elder_username: str, caregiver_username: str):
     elders = load_data("elder")
     caregivers = load_data("caregiver")
