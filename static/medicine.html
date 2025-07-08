@@ -123,109 +123,163 @@
     <button class="close-btn" onclick="closeModal()">बन्द गर्नुहोस्</button>
   </div>
 </div>
-
 <script>
-  const userId = new URLSearchParams(window.location.search).get("userId") || "default";
-  const baseUrl = window.location.origin;
-  const tableBody = document.querySelector('#medicineTable tbody');
-  const form = document.getElementById('medicineForm');
-  const calendarModal = document.getElementById('calendarModal');
-  const calendarGrid = document.getElementById('calendarGrid');
-  let medicineCounter = 1;
-  let medicineData = {};
+const tableBody = document.querySelector('#medicineTable tbody');
+const form = document.getElementById('medicineForm');
+let medicineCounter = 1;
+const userId = window.location.pathname.split('/')[1]; // Extract user ID from URL
 
-  async function loadData() {
-    const res = await fetch(`${baseUrl}/medicine/${userId}`);
-    medicineData = await res.json();
-    tableBody.innerHTML = '';
+// Load initial data from server
+async function loadInitialData() {
+  const response = await fetch(`/${userId}/load_medicine`);
+  const data = await response.json();
+  
+  if (data.medicines && data.medicines.length > 0) {
     medicineCounter = 1;
-
-    for (const [name, entry] of Object.entries(medicineData)) {
+    tableBody.innerHTML = '';
+    data.medicines.forEach(med => {
       const row = document.createElement('tr');
       row.innerHTML = `
         <td>${medicineCounter++}</td>
-        <td onclick="openCalendar('${name}')">${name}</td>
-        <td>${entry.times.join(', ')}</td>
-        <td>${entry.purpose}</td>
+        <td onclick="openCalendar('${med.name}')">${med.name}</td>
+        <td>${med.times.join(', ')}</td>
+        <td>${med.purpose}</td>
       `;
       tableBody.appendChild(row);
-    }
-  }
-
-  async function saveData() {
-    await fetch(`${baseUrl}/medicine/${userId}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(medicineData)
     });
   }
+}
 
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const name = document.getElementById('medName').value.trim();
-    const timesStr = document.getElementById('customTimes').value.trim();
-    const purpose = document.getElementById('purpose').value.trim();
-    const timesArray = timesStr.split(',').map(t => t.trim()).filter(Boolean);
-
-    if (name && timesArray.length > 0 && purpose) {
-      const today = new Date();
-      const track = {};
-
-      for (let i = 0; i < 14; i++) {
-        const date = new Date(today);
-        date.setDate(today.getDate() + i);
-        const dateStr = date.toISOString().split('T')[0];
-        track[dateStr] = {};
-        timesArray.forEach(t => track[dateStr][t] = false);
-      }
-
-      medicineData[name] = { times: timesArray, purpose, track };
-      await saveData();
-      await loadData();
-      form.reset();
-    }
+// Save data to server
+async function saveData() {
+  const medicines = [];
+  const rows = tableBody.querySelectorAll('tr');
+  
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    medicines.push({
+      name: cells[1].textContent,
+      times: cells[2].textContent.split(',').map(t => t.trim()),
+      purpose: cells[3].textContent
+    });
   });
+  
+  await fetch(`/${userId}/save_medicine`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      medicines: medicines,
+      tracking: window.trackingData || {}
+    })
+  });
+}
 
-  async function openCalendar(name) {
-    const entry = medicineData[name];
-    const times = entry.times;
-    const track = entry.track;
+// Modified form submit handler
+form.addEventListener('submit', async function (e) {
+  e.preventDefault();
 
-    document.getElementById('modalTitle').innerText = name + " को सेवन ट्र्याक गर्नुहोस्";
-    calendarModal.style.display = "block";
-    calendarGrid.innerHTML = '';
+  const name = document.getElementById('medName').value.trim();
+  const timesStr = document.getElementById('customTimes').value.trim();
+  const purpose = document.getElementById('purpose').value.trim();
 
-    for (const [date, timeMap] of Object.entries(track)) {
-      const row = document.createElement('div');
-      row.className = 'calendar-row';
-      let timeInputs = '';
+  const timesArray = timesStr.split(',').map(t => t.trim()).filter(Boolean);
 
-      for (const time of times) {
-        const checked = timeMap[time] ? 'checked' : '';
-        timeInputs += `
-          <div style="margin-right: 10px;">
-            <input type="time" value="${time}" disabled />
-            <label><input type="checkbox" ${checked}
-            onchange="toggleIntake('${name}', '${date}', '${time}', this.checked)" /> लिइयो</label>
-          </div>
-        `;
-      }
-
-      row.innerHTML = `<span style="flex: 1; width: 100px;">${date}</span><div style="flex: 2; display: flex; flex-wrap: wrap;">${timeInputs}</div>`;
-      calendarGrid.appendChild(row);
-    }
-  }
-
-  async function toggleIntake(name, date, time, checked) {
-    medicineData[name].track[date][time] = checked;
+  if (name && timesArray.length > 0 && purpose) {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${medicineCounter++}</td>
+      <td onclick="openCalendar('${name}')">${name}</td>
+      <td>${timesArray.join(', ')}</td>
+      <td>${purpose}</td>
+    `;
+    tableBody.appendChild(row);
+    form.reset();
+    
+    // Save to server
     await saveData();
   }
+});
 
-  function closeModal() {
-    calendarModal.style.display = "none";
+// Global tracking data
+window.trackingData = {};
+
+// Modified calendar function
+async function openCalendar(medicineName) {
+  const response = await fetch(`/${userId}/load_medicine`);
+  const data = await response.json();
+  window.trackingData = data.tracking || {};
+  
+  const times = Array.from(tableBody.querySelectorAll('tr'))
+    .find(tr => tr.querySelector('td:nth-child(2)').textContent === medicineName)
+    .querySelector('td:nth-child(3)').textContent.split(',').map(t => t.trim());
+  
+  document.getElementById('modalTitle').innerText = medicineName + " को सेवन ट्र्याक गर्नुहोस्";
+  document.getElementById('calendarModal').style.display = "block";
+
+  const grid = document.getElementById('calendarGrid');
+  grid.innerHTML = '';
+
+  const today = new Date();
+  for (let i = 0; i < 14; i++) {
+    const date = new Date();
+    date.setDate(today.getDate() + i);
+    const dateStr = date.toISOString().split('T')[0];
+
+    const row = document.createElement('div');
+    row.className = 'calendar-row';
+    let timeInputs = '';
+
+    times.forEach(time => {
+      const trackingKey = `${medicineName}_${dateStr}_${time}`;
+      const isTaken = window.trackingData[trackingKey]?.taken || false;
+      const takenTime = window.trackingData[trackingKey]?.actualTime || '';
+      
+      timeInputs += `
+        <div style="display: inline-block; margin-right: 10px;">
+          <input type="time" value="${time}" disabled />
+          <label>
+            <input type="checkbox" ${isTaken ? 'checked' : ''} 
+                   onchange="updateTracking('${medicineName}', '${dateStr}', '${time}', this.checked)" />
+            लिइयो
+          </label>
+          <input type="time" value="${takenTime}" 
+                 onchange="updateActualTime('${medicineName}', '${dateStr}', '${time}', this.value)" />
+        </div>
+      `;
+    });
+
+    row.innerHTML = `
+      <span style="flex: 1;">${dateStr}</span>
+      <div style="flex: 2; display: flex; flex-wrap: wrap;">${timeInputs}</div>
+    `;
+    grid.appendChild(row);
   }
+}
 
-  loadData();
+// New tracking functions
+function updateTracking(medicineName, dateStr, time, isTaken) {
+  const trackingKey = `${medicineName}_${dateStr}_${time}`;
+  window.trackingData[trackingKey] = window.trackingData[trackingKey] || {};
+  window.trackingData[trackingKey].taken = isTaken;
+  saveData();
+}
+
+function updateActualTime(medicineName, dateStr, time, actualTime) {
+  const trackingKey = `${medicineName}_${dateStr}_${time}`;
+  window.trackingData[trackingKey] = window.trackingData[trackingKey] || {};
+  window.trackingData[trackingKey].actualTime = actualTime;
+  saveData();
+}
+
+// Close modal function
+function closeModal() {
+  document.getElementById('calendarModal').style.display = "none";
+}
+
+// Load initial data when page loads
+document.addEventListener('DOMContentLoaded', loadInitialData);
 </script>
 
 </body>
