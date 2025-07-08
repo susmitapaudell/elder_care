@@ -125,94 +125,107 @@
 </div>
 
 <script>
+  const userId = new URLSearchParams(window.location.search).get("userId") || "default";
+  const baseUrl = window.location.origin;
   const tableBody = document.querySelector('#medicineTable tbody');
   const form = document.getElementById('medicineForm');
+  const calendarModal = document.getElementById('calendarModal');
+  const calendarGrid = document.getElementById('calendarGrid');
   let medicineCounter = 1;
-  const medicineData = {};
+  let medicineData = {};
 
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
+  async function loadData() {
+    const res = await fetch(`${baseUrl}/medicine/${userId}`);
+    medicineData = await res.json();
+    tableBody.innerHTML = '';
+    medicineCounter = 1;
 
-    const name = document.getElementById('medName').value.trim();
-    const timesStr = document.getElementById('customTimes').value.trim();
-    const purpose = document.getElementById('purpose').value.trim();
-
-    const timesArray = timesStr.split(',').map(t => t.trim()).filter(Boolean);
-
-    if (name && timesArray.length > 0 && purpose) {
-      medicineData[name] = timesArray;
-
+    for (const [name, entry] of Object.entries(medicineData)) {
       const row = document.createElement('tr');
       row.innerHTML = `
         <td>${medicineCounter++}</td>
         <td onclick="openCalendar('${name}')">${name}</td>
-        <td>${timesArray.join(', ')}</td>
-        <td>${purpose}</td>
+        <td>${entry.times.join(', ')}</td>
+        <td>${entry.purpose}</td>
       `;
       tableBody.appendChild(row);
+    }
+  }
+
+  async function saveData() {
+    await fetch(`${baseUrl}/medicine/${userId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(medicineData)
+    });
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const name = document.getElementById('medName').value.trim();
+    const timesStr = document.getElementById('customTimes').value.trim();
+    const purpose = document.getElementById('purpose').value.trim();
+    const timesArray = timesStr.split(',').map(t => t.trim()).filter(Boolean);
+
+    if (name && timesArray.length > 0 && purpose) {
+      const today = new Date();
+      const track = {};
+
+      for (let i = 0; i < 14; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        const dateStr = date.toISOString().split('T')[0];
+        track[dateStr] = {};
+        timesArray.forEach(t => track[dateStr][t] = false);
+      }
+
+      medicineData[name] = { times: timesArray, purpose, track };
+      await saveData();
+      await loadData();
       form.reset();
     }
   });
-function openCalendar(medicineName) {
-  const times = medicineData[medicineName];
-  document.getElementById('modalTitle').innerText = medicineName + " को सेवन ट्र्याक गर्नुहोस्";
-  document.getElementById('calendarModal').style.display = "block";
 
-  const grid = document.getElementById('calendarGrid');
-  grid.innerHTML = '';
+  async function openCalendar(name) {
+    const entry = medicineData[name];
+    const times = entry.times;
+    const track = entry.track;
 
-  const today = new Date();
-  for (let i = 0; i < 14; i++) {
-    const date = new Date();
-    date.setDate(today.getDate() + i);
-    const dateStr = date.toISOString().split('T')[0];
+    document.getElementById('modalTitle').innerText = name + " को सेवन ट्र्याक गर्नुहोस्";
+    calendarModal.style.display = "block";
+    calendarGrid.innerHTML = '';
 
-    const row = document.createElement('div');
-    row.className = 'calendar-row';
-    let timeInputs = '';
+    for (const [date, timeMap] of Object.entries(track)) {
+      const row = document.createElement('div');
+      row.className = 'calendar-row';
+      let timeInputs = '';
 
-    times.forEach(time => {
-      timeInputs += `
-        <div style="display: inline-block; margin-right: 10px;">
-          <input type="time" value="${time}" />
-          <label><input type="checkbox" /> लिइयो</label>
-        </div>
-      `;
-    });
+      for (const time of times) {
+        const checked = timeMap[time] ? 'checked' : '';
+        timeInputs += `
+          <div style="margin-right: 10px;">
+            <input type="time" value="${time}" disabled />
+            <label><input type="checkbox" ${checked}
+            onchange="toggleIntake('${name}', '${date}', '${time}', this.checked)" /> लिइयो</label>
+          </div>
+        `;
+      }
 
-    row.innerHTML = `
-      <span style="flex: 1;">${dateStr}</span>
-      <div style="flex: 2; display: flex; flex-wrap: wrap;">${timeInputs}</div>
-    `;
-    grid.appendChild(row);
+      row.innerHTML = `<span style="flex: 1; width: 100px;">${date}</span><div style="flex: 2; display: flex; flex-wrap: wrap;">${timeInputs}</div>`;
+      calendarGrid.appendChild(row);
+    }
   }
-}
 
-
+  async function toggleIntake(name, date, time, checked) {
+    medicineData[name].track[date][time] = checked;
+    await saveData();
+  }
 
   function closeModal() {
-    document.getElementById('calendarModal').style.display = "none";
+    calendarModal.style.display = "none";
   }
 
-  // Add two default medicines at start
-  medicineData["Metformin"] = ["07:30", "19:00"];
-  medicineData["Amlodipine"] = ["08:30"];
-
-  const defaultMedicines = [
-    { name: "Metformin", purpose: "डाइबेटीज", times: medicineData["Metformin"] },
-    { name: "Amlodipine", purpose: "रक्तचाप", times: medicineData["Amlodipine"] }
-  ];
-
-  defaultMedicines.forEach(med => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${medicineCounter++}</td>
-      <td onclick="openCalendar('${med.name}')">${med.name}</td>
-      <td>${med.times.join(', ')}</td>
-      <td>${med.purpose}</td>
-    `;
-    tableBody.appendChild(row);
-  });
+  loadData();
 </script>
 
 </body>
