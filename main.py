@@ -33,9 +33,9 @@ def save_data(role, data):
         json.dump(data, f, indent=2)
 
 # Root
-@app.get("/")
-def root():
-    return {"message": "Welcome to Swastha Saathi! Select 'elder' or 'caregiver' and choose login or signup."}
+#@app.get("/")
+#def root():
+ #   return {"message": "Welcome to Swastha Saathi! Select 'elder' or 'caregiver' and choose login or signup."}
 
 # Common login/signup handler
 @app.post("/continue/{action}/{role}")
@@ -112,4 +112,4 @@ def add_profile(role: str, username: str, profile: UserProfile):
         "message": f"Profile updated for {username} ({role})",
         "age": profile.age,
         "bmi": profile.bmi
-    }
+    } 
