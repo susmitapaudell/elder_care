@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+  <meta charset="UTF-8">
+  <title>औषधि तालिका</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    form input, form button {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    form button {
+      background-color: #3498db;
+      color: white;
+      cursor: pointer;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background-color: #fff;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #e6f2ff;
+    }
+    tr:hover {
+      background-color: #f0f8ff;
+      cursor: pointer;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 99;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 5% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .calendar-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      padding: 10px 0;
+      font-size: 14px;
+    }
+    .calendar-row input[type="time"] {
+      width: 80px;
+    }
+    .close-btn {
+      margin-top: 16px;
+      background: #e74c3c;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h1>औषधि तालिका</h1>
+
+<h2>नयाँ औषधि थप्नुहोस्</h2>
+<form id="medicineForm">
+  <input type="text" id="medName" placeholder="औषधिको नाम" required />
+  <input type="text" id="customTimes" placeholder="समयहरू (e.g. 07:30,19:00)" required />
+  <input type="text" id="purpose" placeholder="उद्देश्य" required />
+  <button type="submit">थप गर्नुहोस्</button>
+</form>
+
+<table id="medicineTable">
+  <thead>
+    <tr>
+      <th>क्र.सं</th>
+      <th>औषधि</th>
+      <th>समयहरू</th>
+      <th>उद्देश्य</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Medicine rows will be added dynamically -->
+  </tbody>
+</table>
+
+<!-- Calendar Modal -->
+<div id="calendarModal" class="modal">
+  <div class="modal-content">
+    <h2 id="modalTitle">औषधि सेवन ट्र्याक गर्नुहोस्</h2>
+    <div id="calendarGrid"></div>
+    <button class="close-btn" onclick="closeModal()">बन्द गर्नुहोस्</button>
+  </div>
+</div>
+
+<script>
+  const tableBody = document.querySelector('#medicineTable tbody');
+  const form = document.getElementById('medicineForm');
+  let medicineCounter = 1;
+  const medicineData = {};
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById('medName').value.trim();
+    const timesStr = document.getElementById('customTimes').value.trim();
+    const purpose = document.getElementById('purpose').value.trim();
+
+    const timesArray = timesStr.split(',').map(t => t.trim()).filter(Boolean);
+
+    if (name && timesArray.length > 0 && purpose) {
+      medicineData[name] = timesArray;
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${medicineCounter++}</td>
+        <td onclick="openCalendar('${name}')">${name}</td>
+        <td>${timesArray.join(', ')}</td>
+        <td>${purpose}</td>
+      `;
+      tableBody.appendChild(row);
+      form.reset();
+    }
+  });
+function openCalendar(medicineName) {
+  const times = medicineData[medicineName];
+  document.getElementById('modalTitle').innerText = medicineName + " को सेवन ट्र्याक गर्नुहोस्";
+  document.getElementById('calendarModal').style.display = "block";
+
+  const grid = document.getElementById('calendarGrid');
+  grid.innerHTML = '';
+
+  const today = new Date();
+  for (let i = 0; i < 14; i++) {
+    const date = new Date();
+    date.setDate(today.getDate() + i);
+    const dateStr = date.toISOString().split('T')[0];
+
+    const row = document.createElement('div');
+    row.className = 'calendar-row';
+    let timeInputs = '';
+
+    times.forEach(time => {
+      timeInputs += `
+        <div style="display: inline-block; margin-right: 10px;">
+          <input type="time" value="${time}" />
+          <label><input type="checkbox" /> लिइयो</label>
+        </div>
+      `;
+    });
+
+    row.innerHTML = `
+      <span style="flex: 1;">${dateStr}</span>
+      <div style="flex: 2; display: flex; flex-wrap: wrap;">${timeInputs}</div>
+    `;
+    grid.appendChild(row);
+  }
+}
+
+
+
+  function closeModal() {
+    document.getElementById('calendarModal').style.display = "none";
+  }
+
+  // Add two default medicines at start
+  medicineData["Metformin"] = ["07:30", "19:00"];
+  medicineData["Amlodipine"] = ["08:30"];
+
+  const defaultMedicines = [
+    { name: "Metformin", purpose: "डाइबेटीज", times: medicineData["Metformin"] },
+    { name: "Amlodipine", purpose: "रक्तचाप", times: medicineData["Amlodipine"] }
+  ];
+
+  defaultMedicines.forEach(med => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${medicineCounter++}</td>
+      <td onclick="openCalendar('${med.name}')">${med.name}</td>
+      <td>${med.times.join(', ')}</td>
+      <td>${med.purpose}</td>
+    `;
+    tableBody.appendChild(row);
+  });
+</script>
+
+</body>
+</html>
+
+
