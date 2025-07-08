@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background-color: #fff;
+      color: #333;
+    }
+    .welcome {
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .section {
+      background-color: #f0f0f0;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      text-align: center;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .section img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+      object-fit: cover;
+      border-style: solid;
+      border-color: #c1bcbc;
+      border-width: 3px;
+    }
+    
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #222;
+      margin-bottom: 6px;
+    }
+    .desc {
+      font-size: 14px;
+      color: #555;
+    }
+
+    .profile-menu {
+  position: relative;
+}
+
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #ccc;
+}
+
+.profile-details {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 12px;
+  width: 220px;
+  display: none;
+  border-radius: 8px;
+  z-index: 100;
+}
+
+.profile-details.visible {
+  display: block;
+}
+
+.profile-details .info {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.section-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.section-link:hover .section {
+  background-color: #e0f7fa;
+  transition: background-color 0.3s ease;
+}
+
+
+</style>
+
+
+</head>
+<body>
+
+<a href="profile.html" class="profile-link">
+  <div class="profile-menu">
+    <img src="images/profile.jpg" alt="प्रोफाइल" class="profile-icon" />
+  </div>
+</a>
+
+</div>
+
+
+  <div class="welcome">स्वास्थ्य साथी!</div>
+
+
+  
+
+  <div class="section" onclick="window.location.href='medicine.html'">
+  <img src="images/medicine.jpg" alt="औषधि" />
+  <div class="title">औषधि</div>
+  <div class="desc">तपाईंको दैनिक औषधि अनुसूची हेर्नुहोस्।</div>
+</div>
+
+
+  <a href="appointment.html" class="section-link"></a>
+  <div class="section">
+    <img src="images/appointment.jpeg" alt="अपोइन्टमेन्ट र रिपोर्ट" />
+    <div class="title">अपोइन्टमेन्ट र रिपोर्ट</div>
+    <div class="desc">डाक्टरसँगको भेट समयहरू व्यवस्थित गर्नुहोस् र स्वास्थ्य रिपोर्टहरू सुरक्षित राख्नुहोस्।</div>
+  </div>
+
+  <a href="appointment.html" class="section-link"></a>
+  <div class="section">
+    <img src="images/awareness.jpeg" alt="सचेतना भिडियो" />
+    <div class="title">सचेतना भिडियो</div>
+    <div class="desc">स्वास्थ्य सम्बन्धी जानकारी हेर्नुहोस्।</div>
+  </div>
+
+</body>
+</html>
