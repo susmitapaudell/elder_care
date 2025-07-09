@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+  <meta charset="UTF-8">
+  <title>प्रयोगकर्ता विवरण फारम</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    table { width: 100%; max-width: 600px; margin: auto; border-collapse: collapse; }
+    td { padding: 8px 6px; vertical-align: top; }
+    label { font-weight: bold; }
+    input, select { width: 100%; padding: 6px; font-size: 1rem; }
+    button { margin-top: 16px; padding: 10px 16px; font-size: 1rem; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<h2 style="text-align: center;">प्रयोगकर्ता जानकारी</h2>
+
+<!-- ✅ Add id="profile-form" so we can update it dynamically -->
+<form id="profile-form" method="post">
+  <table>
+    <tr>
+      <td><label for="full_name">नाम:</label></td>
+      <td><input type="text" id="full_name" name="full_name" required></td>
+    </tr>
+    <tr>
+      <td><label for="dob">जन्म मिति:</label></td>
+      <td><input type="date" id="dob" name="dob" required></td>
+    </tr>
+    <tr>
+      <td><label for="blood_group">रक्त समूह:</label></td>
+      <td><input type="text" id="blood_group" name="blood_group" required></td>
+    </tr>
+    <tr>
+      <td><label for="height_cm">उचाइ (cm):</label></td>
+      <td><input type="number" id="height_cm" name="height_cm" required></td>
+    </tr>
+    <tr>
+      <td><label for="weight_kg">तौल (kg):</label></td>
+      <td><input type="number" id="weight_kg" name="weight_kg" required></td>
+    </tr>
+
+    <tr>
+      <td colspan="2" style="text-align: center;">
+        <button type="submit">पठाउनुहोस्</button>
+      </td>
+    </tr>
+  </table>
+</form>
+
+<script>
+  // ✅ Extract query parameters
+  const params = new URLSearchParams(window.location.search);
+  const username = params.get('username');
+  const role = params.get('role');
+
+  // ✅ Set form action dynamically
+  const form = document.getElementById('profile-form');
+  form.action = `/profile/${role}/${username}`;
+</script>
+
+</body>
+</html>

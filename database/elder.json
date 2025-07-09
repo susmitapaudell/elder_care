@@ -28,5 +28,10 @@
     "username": "",
     "phone": "",
     "password": ""
+  },
+  "fds": {
+    "username": "fds",
+    "phone": "gfh",
+    "password": "gd"
   }
 }

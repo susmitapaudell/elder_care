@@ -23,5 +23,95 @@
     "username": "fef",
     "phone": "434",
     "password": "efe"
+  },
+  "": {
+    "username": "",
+    "phone": "",
+    "password": ""
+  },
+  "dsfsd": {
+    "username": "dsfsd",
+    "phone": "32",
+    "password": "fs"
+  },
+  "fsfss": {
+    "username": "fsfss",
+    "phone": "gasf",
+    "password": "wrerwr"
+  },
+  "ff": {
+    "username": "ff",
+    "phone": "fs",
+    "password": "fs"
+  },
+  "fd": {
+    "username": "fd",
+    "phone": "fg",
+    "password": "4"
+  },
+  "das": {
+    "username": "das",
+    "phone": "da",
+    "password": "da"
+  },
+  "dsdsdsfds": {
+    "username": "dsdsdsfds",
+    "phone": "gwefw",
+    "password": "sfwef"
+  },
+  "rw": {
+    "username": "rw",
+    "phone": "tett",
+    "password": "34535",
+    "full_name": "rwrwe",
+    "dob": "2025-07-17",
+    "blood_group": "b+",
+    "height_cm": 3.0,
+    "weight_kg": 3.0
+  },
+  "fsdf": {
+    "username": "fsdf",
+    "phone": "gs",
+    "password": "fs",
+    "full_name": "gsdg",
+    "dob": "2025-07-05",
+    "blood_group": "fsdf",
+    "height_cm": 2.0,
+    "weight_kg": 3.0
+  },
+  "gsdg": {
+    "username": "gsdg",
+    "phone": "gsgf",
+    "password": "dsf",
+    "full_name": "fsdfs",
+    "dob": "2025-07-04",
+    "blood_group": "B+",
+    "height_cm": 1.0,
+    "weight_kg": 1.0
+  },
+  "re": {
+    "username": "re",
+    "phone": "we",
+    "password": "s",
+    "full_name": "dw",
+    "dob": "2025-07-18",
+    "blood_group": "dw",
+    "height_cm": 1.0,
+    "weight_kg": 1.0
+  },
+  "eweda": {
+    "username": "eweda",
+    "phone": "fedas",
+    "password": "fsfsd"
+  },
+  "Shrayu": {
+    "username": "Shrayu",
+    "phone": "000000",
+    "password": "sh",
+    "full_name": "shrayu",
+    "dob": "2025-07-18",
+    "blood_group": "B+",
+    "height_cm": 1.0,
+    "weight_kg": 45.0
   }
 }
