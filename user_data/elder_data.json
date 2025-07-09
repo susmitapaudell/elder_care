@@ -9,5 +9,14 @@
       "purpose": "Tauko dukhne"
     }
   ],
-  "tracking": {}
+  "tracking": {
+    "Paracetamol_2025-07-09_6:30": {
+      "taken": true,
+      "actualTime": "6:30"
+    },
+    "Paracetamol_2025-07-09_19:00": {
+      "taken": true,
+      "actualTime": "19:00"
+    }
+  }
 }

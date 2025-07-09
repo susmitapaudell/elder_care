@@ -5,15 +5,15 @@ import json, os
 from fastapi.templating import Jinja2Templates
 
 from fastapi import Request
-from routes import auth
-from routes import caregiver_medicine
-from routes import profile  # 👈 import
+from routes import caregiver_medicine,elder_medicine, profile, auth
 
 
 app = FastAPI()
 
 app.include_router(profile.router)
 app.include_router(auth.router)
+app.include_router(caregiver_medicine.router)
+app.include_router(elder_medicine.router)
 app.include_router(caregiver_medicine.router)
 
 DATA_DIR = "database"
