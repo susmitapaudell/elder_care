@@ -41,7 +41,7 @@ async def medicine_page(request: Request, user_id: str):
     
     # Load user data to pass to template
     user_data = load_user_data(user_id)
-    return templates.TemplateResponse("medicine.html", {
+    return templates.TemplateResponse("caregiver_medicine.html", {
         "request": request,
         "user_id": user_id,
         "initial_data": user_data
