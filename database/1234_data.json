@@ -1,0 +1,20 @@
+{
+  "medicines": [
+    {
+      "name": "Paracetamol",
+      "purpose": "Tauko dukhne",
+      "times": [
+        "6:30",
+        "19:00"
+      ]
+    },
+    {
+      "name": "sinex",
+      "purpose": "period pain",
+      "times": [
+        "5:00"
+      ]
+    }
+  ],
+  "history": {}
+}

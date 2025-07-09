@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, APIRouter
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -7,9 +7,10 @@ import os
 from pathlib import Path
 from datetime import datetime
 
-app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
+router = APIRouter()
+router.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="static")
+
 
 # Directory to store user data
 DATA_DIR = "user_data"
@@ -33,7 +34,7 @@ def save_user_data(user_id: str, data: dict):
     with open(db_path, 'w') as f:
         json.dump(data, f, indent=2)
 
-@app.get("/{user_id}/medicine", response_class=HTMLResponse)
+@router.get("/{user_id}/medicine", response_class=HTMLResponse)
 async def medicine_page(request: Request, user_id: str):
     if not (user_id.isdigit() and len(user_id) == 4):
         raise HTTPException(status_code=404, detail="User ID must be 4 digits")
@@ -46,7 +47,7 @@ async def medicine_page(request: Request, user_id: str):
         "initial_data": user_data
     })
 
-@app.post("/{user_id}/save_medicine")
+@router.post("/{user_id}/save_medicine")
 async def save_medicine(user_id: str, request: Request):
     data = await request.json()
     user_data = load_user_data(user_id)
@@ -62,6 +63,6 @@ async def save_medicine(user_id: str, request: Request):
     save_user_data(user_id, user_data)
     return JSONResponse({"status": "success"})
 
-@app.get("/{user_id}/load_medicine")
+@router.get("/{user_id}/load_medicine")
 async def load_medicine(user_id: str):
     return JSONResponse(load_user_data(user_id))
