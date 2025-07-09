@@ -2,8 +2,11 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import json, os
 from userprofile import UserProfile
+from routes import medicine
 
 app = FastAPI()
+
+app.include_router(medicine.router)
 
 DATA_DIR = "database"
 os.makedirs(DATA_DIR, exist_ok=True)

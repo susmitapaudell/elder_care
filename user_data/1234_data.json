@@ -1,0 +1,32 @@
+{
+  "medicines": [
+    {
+      "name": "Paracetamol",
+      "times": [
+        "6:30",
+        "19:00"
+      ],
+      "purpose": "Tauko dukhne"
+    },
+    {
+      "name": "sinex",
+      "times": [
+        "5:00"
+      ],
+      "purpose": "period pain"
+    },
+    {
+      "name": "cetrizin",
+      "times": [
+        "4:30"
+      ],
+      "purpose": "allergy"
+    }
+  ],
+  "tracking": {
+    "cetrizin_2025-07-19_4:30": {
+      "taken": true,
+      "actualTime": "10:39"
+    }
+  }
+}
