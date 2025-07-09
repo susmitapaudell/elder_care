@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <style>
+   body {
+  font-family: sans-serif;
+  padding: 20px;
+  background-color: #fff;
+  color: #333;
+  max-height: 100vh;
+  overflow-y: auto;
+  margin-bottom: 80px; /* Adds breathing room so the emergency button doesn't overlap */
+}
+    .welcome {
+  font-size: 38px; /* Increased font size */
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 40px; /* Adds more space before mic icon */
+}
+
+    .section {
+      background-color: #f0f0f0;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      text-align: center;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .section img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+      object-fit: cover;
+      border-style: solid;
+      border-color: #c1bcbc;
+      border-width: 3px;
+    }
+    
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #222;
+      margin-bottom: 6px;
+    }
+    .desc {
+      font-size: 14px;
+      color: #555;
+    }
+
+    .profile-menu {
+  position: relative;
+}
+
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #ccc;
+}
+
+.profile-details {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 12px;
+  width: 220px;
+  display: none;
+  border-radius: 8px;
+  z-index: 100;
+}
+
+.profile-details.visible {
+  display: block;
+}
+
+.profile-details .info {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.section-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.section-link:hover .section {
+  background-color: #e0f7fa;
+  transition: background-color 0.3s ease;
+}
+
+.emergency-button {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background-color: #d32f2f;
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: background-color 0.3s ease;
+  z-index: 200;
+}
+
+.emergency-button:hover {
+  background-color: #b71c1c;
+}
+
+
+
+</style>
+
+
+</head>
+<body>
+
+<a href="profile.html" class="profile-link">
+  <div class="profile-menu">
+    <img src="images/profile.jpg" alt="प्रोफाइल" class="profile-icon" />
+  </div>
+</a>
+
+</div>
+
+
+<div class="welcome">स्वास्थ्य साथी!</div>
+
+
+<div style="text-align:center; margin-bottom: 15px;">
+  <button onclick="startListening()" style="
+    font-size: 70px; /* Bigger mic */
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #444;
+  ">
+    🎤
+  </button>
+  <div id="recognizedText" style="margin-top:10px; font-size:16px; color:#444;"></div>
+</div>
+<div style="height: 30px;"></div>
+
+
+
+<a href="medicine.html" class="section-link">
+  <div class="section">
+    <img src="images/medicine.jpg" alt="औषधी" />
+    <div class="title">औषधी</div>
+    <div class="desc">तपाईंको दैनिक औषधी अनुसूची हेर्नुहोस्</div>
+  </div>
+</a>
+
+  
+ 
+<a href="appointment.html" class="section-link">
+  <div class="section">
+    <img src="images/appointment.jpeg" alt="अपोइन्टमेन्ट र रिपोर्ट" />
+    <div class="title">अपोइन्टमेन्ट र रिपोर्ट</div>
+    <div class="desc">मेडिकल अपोइन्टमेन्ट र रिपोर्टहरू व्यवस्थापन गर्नुहोस्।</div>
+  </div>
+</a>
+
+
+<a href="awareness.html" class="section-link">
+  <div class="section">
+    <img src="images/awareness.jpeg" alt="सचेतना" />
+    <div class="title">सचेतना</div>
+    <div class="desc">स्वास्थ्य सम्बन्धी जानकारी हेर्नुहोस्।</div>
+  </div>
+</a>
+
+
+</div>
+
+<script>
+  function startListening() {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'ne-NP'; // Nepali language
+
+    recognition.onresult = function(event) {
+      const transcript = event.results[0][0].transcript;
+      document.getElementById('recognizedText').innerText = transcript;
+    };
+
+    recognition.onerror = function(event) {
+      document.getElementById('recognizedText').innerText = "त्रुटि: " + event.error;
+    };
+
+    recognition.start();
+  }
+</script>
+<!-- Add this spacer div just before the emergency button -->
+<div style="height: 100px;"></div>
+
+<!-- Emergency Button -->
+<a href="emergency.html" class="emergency-button">
+  🚨 आपतकालीन सहायता
+</a>
+
+
+
+</body>
+</html>
