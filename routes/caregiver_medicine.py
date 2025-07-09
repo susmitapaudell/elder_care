@@ -34,7 +34,7 @@ def save_user_data(user_id: str, data: dict):
     with open(db_path, 'w') as f:
         json.dump(data, f, indent=2)
 
-@router.get("/{user_id}/medicine", response_class=HTMLResponse)
+@router.get("/elder/{user_id}/medicine", response_class=HTMLResponse)
 async def medicine_page(request: Request, user_id: str):
     if not (user_id.isdigit() and len(user_id) == 4):
         raise HTTPException(status_code=404, detail="User ID must be 4 digits")
@@ -47,7 +47,7 @@ async def medicine_page(request: Request, user_id: str):
         "initial_data": user_data
     })
 
-@router.post("/{user_id}/save_medicine")
+@router.post("/elder/{user_id}/save_medicine")
 async def save_medicine(user_id: str, request: Request):
     data = await request.json()
     user_data = load_user_data(user_id)
@@ -61,8 +61,9 @@ async def save_medicine(user_id: str, request: Request):
         user_data['tracking'] = data['tracking']
     
     save_user_data(user_id, user_data)
+    print(f"✅ Saved to {get_user_db_path(user_id)}")
     return JSONResponse({"status": "success"})
 
-@router.get("/{user_id}/load_medicine")
+@router.get("/elder/{user_id}/load_medicine")
 async def load_medicine(user_id: str):
     return JSONResponse(load_user_data(user_id))

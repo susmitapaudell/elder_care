@@ -1,0 +1,13 @@
+{
+  "medicines": [
+    {
+      "name": "Paracetamol",
+      "times": [
+        "6:30",
+        "19:00"
+      ],
+      "purpose": "Tauko dukhne"
+    }
+  ],
+  "tracking": {}
+}

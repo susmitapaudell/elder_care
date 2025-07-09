@@ -93,6 +93,11 @@
 
 <h1>औषधि तालिका</h1>
 
+<div id="greeting" style="font-size: 24px; margin: 20px 0;"></div>
+<div id="question" style="font-size: 20px;"></div>
+<input type="text" id="textResponse" placeholder="Type your answer here..." style="display: none;" />
+
+
 <h2>नयाँ औषधि थप्नुहोस्</h2>
 <form id="medicineForm">
   <input type="text" id="medName" placeholder="औषधिको नाम" required />
@@ -131,7 +136,7 @@ const userId = window.location.pathname.split('/')[1]; // Extract user ID from U
 
 // Load initial data from server
 async function loadInitialData() {
-  const response = await fetch(`/elder/${userId}/load_medicine`);
+  const response = await fetch(`/${userId}/load_medicine`);
   const data = await response.json();
   
   if (data.medicines && data.medicines.length > 0) {
@@ -164,7 +169,7 @@ async function saveData() {
     });
   });
   
-  await fetch(`/elder/${userId}/save_medicine`, {
+  await fetch(`/${userId}/save_medicine`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -207,7 +212,7 @@ window.trackingData = {};
 
 // Modified calendar function
 async function openCalendar(medicineName) {
-  const response = await fetch(`/elder/${userId}/load_medicine`);
+  const response = await fetch(`/${userId}/load_medicine`);
   const data = await response.json();
   window.trackingData = data.tracking || {};
   
