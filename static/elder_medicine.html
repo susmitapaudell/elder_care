@@ -13,24 +13,6 @@
       text-align: center;
       color: #2c3e50;
     }
-    form {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-    form input, form button {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-    form button {
-      background-color: #3498db;
-      color: white;
-      cursor: pointer;
-    }
     table {
       border-collapse: collapse;
       width: 100%;
@@ -87,19 +69,56 @@
       border-radius: 6px;
       cursor: pointer;
     }
+    .last-medicine {
+      text-align: center;
+      background-color: #fffacd;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .confirmation-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+    #userResponse {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 200px;
+    }
+    .confirm-btn {
+      background-color: #2ecc71;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .congrats-message {
+      text-align: center;
+      background-color: #d4edda;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      font-size: 18px;
+      display: none;
+    }
   </style>
 </head>
 <body>
 
 <h1>औषधि तालिका</h1>
+<div id="lastMedicinePrompt" class="last-medicine"></div>
+<div id="congratsMessage" class="congrats-message">बधाई छ! तपाईंले आजका सबै औषधि लिनुभयो!</div>
 
-<h2>नयाँ औषधि थप्नुहोस्</h2>
-<form id="medicineForm">
-  <input type="text" id="medName" placeholder="औषधिको नाम" required />
-  <input type="text" id="customTimes" placeholder="समयहरू (e.g. 07:30,19:00)" required />
-  <input type="text" id="purpose" placeholder="उद्देश्य" required />
-  <button type="submit">थप गर्नुहोस्</button>
-</form>
+<div class="confirmation-container">
+  <input type="text" id="userResponse" placeholder="हो / होइन लेख्नुहोस्" />
+  <button class="confirm-btn" onclick="processConfirmation()">पुष्टि गर्नुहोस्</button>
+</div>
 
 <table id="medicineTable">
   <thead>
@@ -123,30 +142,188 @@
     <button class="close-btn" onclick="closeModal()">बन्द गर्नुहोस्</button>
   </div>
 </div>
+
 <script>
 const tableBody = document.querySelector('#medicineTable tbody');
-const form = document.getElementById('medicineForm');
+const lastMedicinePrompt = document.getElementById('lastMedicinePrompt');
+const userResponseInput = document.getElementById('userResponse');
+const congratsMessage = document.getElementById('congratsMessage');
 let medicineCounter = 1;
-const userId = window.location.pathname.split('/')[1]; // Extract user ID from URL
+const userId = window.location.pathname.split('/')[1];
+let currentTrackingInfo = {};
+window.trackingData = {};
+
+// Function to check if all medicines for today are taken
+function checkAllMedicinesTaken() {
+  const today = new Date().toISOString().split('T')[0];
+  const rows = tableBody.querySelectorAll('tr');
+  
+  for (const row of rows) {
+    const medicineName = row.querySelector('td:nth-child(2)').textContent;
+    const times = row.querySelector('td:nth-child(3)').textContent.split(',').map(t => t.trim());
+    
+    for (const time of times) {
+      const trackingKey = `${medicineName}_${today}_${time}`;
+      if (!window.trackingData[trackingKey]?.taken) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+// Function to get all medicines that should have been taken today, sorted by time
+function getTodaysMedicines() {
+  const today = new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const currentTime = now.getHours() * 100 + now.getMinutes();
+  let medicines = [];
+
+  const rows = tableBody.querySelectorAll('tr');
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    const medicineName = cells[1].textContent;
+    const times = cells[2].textContent.split(',').map(t => t.trim());
+    
+    times.forEach(time => {
+      const [hours, minutes] = time.split(':').map(Number);
+      const medicineTime = hours * 100 + minutes;
+      
+      // Only include medicines that should have been taken by now
+      if (medicineTime <= currentTime) {
+        medicines.push({
+          name: medicineName,
+          time: time,
+          timeValue: medicineTime
+        });
+      }
+    });
+  });
+
+  // Sort medicines by time (earliest first)
+  medicines.sort((a, b) => a.timeValue - b.timeValue);
+  return medicines;
+}
+
+// Update the last medicine prompt
+function updateLastMedicinePrompt() {
+  if (checkAllMedicinesTaken()) {
+    congratsMessage.style.display = 'block';
+    lastMedicinePrompt.style.display = 'none';
+    return;
+  } else {
+    congratsMessage.style.display = 'none';
+    lastMedicinePrompt.style.display = 'block';
+  }
+
+  const todaysMedicines = getTodaysMedicines();
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Find the first medicine that hasn't been taken yet
+  for (const med of todaysMedicines) {
+    const trackingKey = `${med.name}_${today}_${med.time}`;
+    if (!window.trackingData[trackingKey]?.taken) {
+      lastMedicinePrompt.textContent = `तपाईंले ${med.name} (${med.time}) लिनुभयो?`;
+      currentTrackingInfo = {
+        medicineName: med.name,
+        dateStr: today,
+        time: med.time
+      };
+      return;
+    }
+  }
+  
+  // If all medicines for today have been taken
+  lastMedicinePrompt.textContent = 'कुनै औषधि लिन बाँकी छैन';
+  currentTrackingInfo = {};
+}
+
+// Process user confirmation
+async function processConfirmation() {
+  const response = userResponseInput.value.trim().toLowerCase();
+  
+  if (!currentTrackingInfo.medicineName) {
+    alert('कुनै औषधि लिन बाँकी छैन');
+    userResponseInput.value = '';
+    return;
+  }
+
+  if (response === 'हो' || response === 'ho') {
+    // Update tracking data
+    const trackingKey = `${currentTrackingInfo.medicineName}_${currentTrackingInfo.dateStr}_${currentTrackingInfo.time}`;
+    window.trackingData[trackingKey] = {
+      taken: true,
+      actualTime: currentTrackingInfo.time
+    };
+    
+    // Save data to backend
+    await saveData();
+    alert('डाटा अपडेट भयो');
+    userResponseInput.value = '';
+    
+    // Update UI
+    updateLastMedicinePrompt();
+    updateCheckboxInCalendar(currentTrackingInfo.medicineName, currentTrackingInfo.dateStr, currentTrackingInfo.time);
+    
+  } else if (response === 'होइन' || response === 'hoin') {
+    alert('धन्यवाद');
+    userResponseInput.value = '';
+  } else {
+    alert('कृपया "हो" वा "होइन" मा उत्तर दिनुहोस्');
+  }
+}
+
+// Update checkbox in calendar view if it's open
+function updateCheckboxInCalendar(medicineName, dateStr, time) {
+  const calendarModal = document.getElementById('calendarModal');
+  if (calendarModal.style.display === 'block') {
+    const checkboxes = document.querySelectorAll('#calendarGrid input[type="checkbox"]');
+    const timeInputs = document.querySelectorAll('#calendarGrid input[type="time"][disabled]');
+    
+    checkboxes.forEach((checkbox, index) => {
+      const rowDate = checkbox.closest('.calendar-row').querySelector('span').textContent;
+      const rowTime = timeInputs[index].value;
+      
+      if (rowDate === dateStr && rowTime === time) {
+        checkbox.checked = true;
+        // Also update the actual time input
+        const actualTimeInputs = document.querySelectorAll('#calendarGrid input[type="time"]:not([disabled])');
+        actualTimeInputs[index].value = time;
+      }
+    });
+  }
+}
 
 // Load initial data from server
 async function loadInitialData() {
-  const response = await fetch(`/caregiver/${userId}/load_medicine`);
-  const data = await response.json();
-  
-  if (data.medicines && data.medicines.length > 0) {
-    medicineCounter = 1;
-    tableBody.innerHTML = '';
-    data.medicines.forEach(med => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${medicineCounter++}</td>
-        <td onclick="openCalendar('${med.name}')">${med.name}</td>
-        <td>${med.times.join(', ')}</td>
-        <td>${med.purpose}</td>
-      `;
-      tableBody.appendChild(row);
-    });
+  try {
+    const response = await fetch(`/elder/load_medicine`);
+    const data = await response.json();
+    
+    if (data.medicines && data.medicines.length > 0) {
+      medicineCounter = 1;
+      tableBody.innerHTML = '';
+      data.medicines.forEach(med => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${medicineCounter++}</td>
+          <td onclick="openCalendar('${med.name}')">${med.name}</td>
+          <td>${med.times.join(', ')}</td>
+          <td>${med.purpose}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+    
+    // Initialize tracking data from server
+    if (data.tracking) {
+      window.trackingData = data.tracking;
+    }
+    
+    // Update the last medicine prompt after loading data
+    updateLastMedicinePrompt();
+  } catch (error) {
+    console.error('Error loading data:', error);
   }
 }
 
@@ -164,106 +341,95 @@ async function saveData() {
     });
   });
   
-  await fetch(`/caregiver/${userId}/save_medicine`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      medicines: medicines,
-      tracking: window.trackingData || {}
-    })
-  });
-}
-
-// Modified form submit handler
-form.addEventListener('submit', async function (e) {
-  e.preventDefault();
-
-  const name = document.getElementById('medName').value.trim();
-  const timesStr = document.getElementById('customTimes').value.trim();
-  const purpose = document.getElementById('purpose').value.trim();
-
-  const timesArray = timesStr.split(',').map(t => t.trim()).filter(Boolean);
-
-  if (name && timesArray.length > 0 && purpose) {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${medicineCounter++}</td>
-      <td onclick="openCalendar('${name}')">${name}</td>
-      <td>${timesArray.join(', ')}</td>
-      <td>${purpose}</td>
-    `;
-    tableBody.appendChild(row);
-    form.reset();
-    
-    // Save to server
-    await saveData();
-  }
-});
-
-// Global tracking data
-window.trackingData = {};
-
-// Modified calendar function
-async function openCalendar(medicineName) {
-  const response = await fetch(`/caregiver/${userId}/load_medicine`);
-  const data = await response.json();
-  window.trackingData = data.tracking || {};
-  
-  const times = Array.from(tableBody.querySelectorAll('tr'))
-    .find(tr => tr.querySelector('td:nth-child(2)').textContent === medicineName)
-    .querySelector('td:nth-child(3)').textContent.split(',').map(t => t.trim());
-  
-  document.getElementById('modalTitle').innerText = medicineName + " को सेवन ट्र्याक गर्नुहोस्";
-  document.getElementById('calendarModal').style.display = "block";
-
-  const grid = document.getElementById('calendarGrid');
-  grid.innerHTML = '';
-
-  const today = new Date();
-  for (let i = 0; i < 14; i++) {
-    const date = new Date();
-    date.setDate(today.getDate() + i);
-    const dateStr = date.toISOString().split('T')[0];
-
-    const row = document.createElement('div');
-    row.className = 'calendar-row';
-    let timeInputs = '';
-
-    times.forEach(time => {
-      const trackingKey = `${medicineName}_${dateStr}_${time}`;
-      const isTaken = window.trackingData[trackingKey]?.taken || false;
-      const takenTime = window.trackingData[trackingKey]?.actualTime || '';
-      
-      timeInputs += `
-        <div style="display: inline-block; margin-right: 10px;">
-          <input type="time" value="${time}" disabled />
-          <label>
-            <input type="checkbox" ${isTaken ? 'checked' : ''} 
-                   onchange="updateTracking('${medicineName}', '${dateStr}', '${time}', this.checked)" />
-            लिइयो
-          </label>
-          <input type="time" value="${takenTime}" 
-                 onchange="updateActualTime('${medicineName}', '${dateStr}', '${time}', this.value)" />
-        </div>
-      `;
+  try {
+    const response = await fetch(`/elder/save_medicine`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        medicines: medicines,
+        tracking: window.trackingData
+      })
     });
-
-    row.innerHTML = `
-      <span style="flex: 1;">${dateStr}</span>
-      <div style="flex: 2; display: flex; flex-wrap: wrap;">${timeInputs}</div>
-    `;
-    grid.appendChild(row);
+    
+    if (!response.ok) {
+      throw new Error('Failed to save data');
+    }
+  } catch (error) {
+    console.error('Error saving data:', error);
+    alert('डाटा सेभ गर्दा त्रुटि भयो');
   }
 }
 
-// New tracking functions
+// Calendar function
+async function openCalendar(medicineName) {
+  try {
+    const response = await fetch(`/elder/load_medicine`);
+    const data = await response.json();
+    if (data.tracking) {
+      window.trackingData = data.tracking;
+    }
+    
+    const times = Array.from(tableBody.querySelectorAll('tr'))
+      .find(tr => tr.querySelector('td:nth-child(2)').textContent === medicineName)
+      .querySelector('td:nth-child(3)').textContent.split(',').map(t => t.trim());
+    
+    document.getElementById('modalTitle').innerText = medicineName + " को सेवन ट्र्याक गर्नुहोस्";
+    document.getElementById('calendarModal').style.display = "block";
+
+    const grid = document.getElementById('calendarGrid');
+    grid.innerHTML = '';
+
+    const today = new Date();
+    for (let i = 0; i < 7; i++) {
+      const date = new Date();
+      date.setDate(today.getDate() + i);
+      const dateStr = date.toISOString().split('T')[0];
+
+      const row = document.createElement('div');
+      row.className = 'calendar-row';
+      let timeInputs = '';
+
+      times.forEach(time => {
+        const trackingKey = `${medicineName}_${dateStr}_${time}`;
+        const isTaken = window.trackingData[trackingKey]?.taken || false;
+        const takenTime = window.trackingData[trackingKey]?.actualTime || time;
+        
+        timeInputs += `
+          <div style="display: inline-block; margin-right: 10px;">
+            <input type="time" value="${time}" disabled />
+            <label>
+              <input type="checkbox" ${isTaken ? 'checked' : ''} 
+                     onchange="updateTracking('${medicineName}', '${dateStr}', '${time}', this.checked)" />
+              लिइयो
+            </label>
+            <input type="time" value="${takenTime}" 
+                   onchange="updateActualTime('${medicineName}', '${dateStr}', '${time}', this.value)" />
+          </div>
+        `;
+      });
+
+      row.innerHTML = `
+        <span style="flex: 1;">${dateStr}</span>
+        <div style="flex: 2; display: flex; flex-wrap: wrap;">${timeInputs}</div>
+      `;
+      grid.appendChild(row);
+    }
+  } catch (error) {
+    console.error('Error opening calendar:', error);
+  }
+}
+
+// Tracking functions
 function updateTracking(medicineName, dateStr, time, isTaken) {
   const trackingKey = `${medicineName}_${dateStr}_${time}`;
   window.trackingData[trackingKey] = window.trackingData[trackingKey] || {};
   window.trackingData[trackingKey].taken = isTaken;
-  saveData();
+  if (isTaken && !window.trackingData[trackingKey].actualTime) {
+    window.trackingData[trackingKey].actualTime = time;
+  }
+  saveData().then(updateLastMedicinePrompt);
 }
 
 function updateActualTime(medicineName, dateStr, time, actualTime) {
@@ -280,9 +446,9 @@ function closeModal() {
 
 // Load initial data when page loads
 document.addEventListener('DOMContentLoaded', loadInitialData);
-</script>
 
+// Update the prompt every minute to account for time changes
+setInterval(updateLastMedicinePrompt, 60000);
+</script>
 </body>
 </html>
-
-

@@ -113,5 +113,15 @@
     "blood_group": "B+",
     "height_cm": 1.0,
     "weight_kg": 45.0
+  },
+  "080bei041": {
+    "username": "080bei041",
+    "phone": "9876543210",
+    "password": "aa",
+    "full_name": "Shraddha",
+    "dob": "2025-07-09",
+    "blood_group": "A+",
+    "height_cm": 163.0,
+    "weight_kg": 55.0
   }
 }

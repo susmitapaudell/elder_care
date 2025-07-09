@@ -1,7 +1,7 @@
 {
   "medicines": [
     {
-      "name": "Paracetamol",
+      "name": "sinex",
       "times": [
         "6:30",
         "19:00"
@@ -10,11 +10,11 @@
     }
   ],
   "tracking": {
-    "Paracetamol_2025-07-09_6:30": {
+    "sinex_2025-07-09_6:30": {
       "taken": true,
       "actualTime": "6:30"
     },
-    "Paracetamol_2025-07-09_19:00": {
+    "sinex_2025-07-09_19:00": {
       "taken": true,
       "actualTime": "19:00"
     }
