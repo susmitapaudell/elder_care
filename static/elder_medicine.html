@@ -297,7 +297,7 @@ function updateCheckboxInCalendar(medicineName, dateStr, time) {
 // Load initial data from server
 async function loadInitialData() {
   try {
-    const response = await fetch(`/elder/${userId}/load_medicine`);
+    const response = await fetch(`/elder/load_medicine`);
     const data = await response.json();
     
     if (data.medicines && data.medicines.length > 0) {
@@ -342,7 +342,7 @@ async function saveData() {
   });
   
   try {
-    const response = await fetch(`/elder/${userId}/save_medicine`, {
+    const response = await fetch(`/elder/save_medicine`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -365,7 +365,7 @@ async function saveData() {
 // Calendar function
 async function openCalendar(medicineName) {
   try {
-    const response = await fetch(`/elder/${userId}/load_medicine`);
+    const response = await fetch(`/elder/load_medicine`);
     const data = await response.json();
     if (data.tracking) {
       window.trackingData = data.tracking;

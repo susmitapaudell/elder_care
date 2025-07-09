@@ -131,7 +131,7 @@ const userId = window.location.pathname.split('/')[1]; // Extract user ID from U
 
 // Load initial data from server
 async function loadInitialData() {
-  const response = await fetch(`/elder/${userId}/load_medicine`);
+  const response = await fetch(`/elder/load_medicine`);
   const data = await response.json();
   
   if (data.medicines && data.medicines.length > 0) {
@@ -164,7 +164,7 @@ async function saveData() {
     });
   });
   
-  await fetch(`/elder/${userId}/save_medicine`, {
+  await fetch(`/elder/save_medicine`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -207,7 +207,7 @@ window.trackingData = {};
 
 // Modified calendar function
 async function openCalendar(medicineName) {
-  const response = await fetch(`/elder/${userId}/load_medicine`);
+  const response = await fetch(`/elder/load_medicine`);
   const data = await response.json();
   window.trackingData = data.tracking || {};
   

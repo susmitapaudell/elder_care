@@ -1,0 +1,15 @@
+{
+    "medicines": [
+        {
+            "name": "Medicine 1",
+            "times": ["08:00", "20:00"],
+            "purpose": "For blood pressure"
+        }
+    ],
+    "tracking": {
+        "Medicine 1_2023-11-15_08:00": {
+            "taken": true,
+            "actualTime": "08:05"
+        }
+    }
+}
