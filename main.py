@@ -32,6 +32,7 @@ def save_data(role, data):
     with open(get_path(role), "w") as f:
         json.dump(data, f, indent=2)
 
+# root
 print("Hello from your local code and the remote repo")
 
 # Common login/signup handler
@@ -78,6 +79,12 @@ def connect_users(elder_username: str, caregiver_username: str):
 from fastapi.staticfiles import StaticFiles
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
+
+#new
+
+from datetime import datetime
+from fastapi import HTTPException
+
 @app.post("/profile/{role}/{username}")
 def add_profile(role: str, username: str, profile: UserProfile):
     # Validate role
@@ -91,22 +98,31 @@ def add_profile(role: str, username: str, profile: UserProfile):
     if username not in users:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Update user's info with profile fields and computed values
-    users[username].update(profile.model_dump())
+    # Calculate BMI
+    bmi = round(profile.weight_kg / ((profile.height_cm / 100) ** 2), 2)
 
-    users[username]['username'] = profile.full_name
-    users[username]['role'] = profile.role
-    users[username]['dob'] = profile.dob
-    users[username]['height_cm'] = profile.height_cm
-    users[username]['weight_kg'] = profile.weight_kg
-    users[username]['bmi'] = profile.bmi
-    users[username]['blood_group'] = profile.blood_group
+    # Calculate age
+    birth_date = datetime.strptime(profile.dob, "%Y-%m-%d")
+    today = datetime.today()
+    age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
 
-    # Save back updated data
+    # Update user data
+    users[username].update({
+        "username": profile.full_name,
+        "role": profile.role,
+        "dob": profile.dob,
+        "height_cm": profile.height_cm,
+        "weight_kg": profile.weight_kg,
+        "bmi": bmi,
+        "blood_group": profile.blood_group,
+        "age": age
+    })
+
+    # Save updated data
     save_data(role, users)
 
     return {
         "message": f"Profile updated for {username} ({role})",
-        "age": profile.age,
-        "bmi": profile.bmi
-    } 
+        "age": age,
+        "bmi": bmi
+    }

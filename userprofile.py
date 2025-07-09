@@ -1,5 +1,9 @@
 from pydantic import BaseModel, field_validator
 from datetime import date
+import json, os
+from fastapi import FastAPI, HTTPException
+
+app = FastAPI()
 
 class UserProfile(BaseModel):
     full_name: str
@@ -9,6 +13,7 @@ class UserProfile(BaseModel):
     weight_kg: float        # Weight in kilograms
     blood_group: str        # Blood group string like "A+", "O-", etc.
 
+    @app.post("/userprofile")
     @property
     def age(self) -> int:
         today = date.today()
